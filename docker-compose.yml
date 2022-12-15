@@ -1,0 +1,51 @@
+version: "3.7"
+services:
+  app:
+    build:
+      args:
+        user: root
+        uid: 0
+      context: ./
+      dockerfile: Dockerfile
+    image: pyrocms
+    ports:
+      - "80:8000"
+    container_name: pyrocms
+    restart: unless-stopped
+    working_dir: /var/www/
+    volumes:
+      - ./:/var/www
+    networks:
+      - apoio
+    depends_on:
+      - db
+
+  db:
+    image: mysql:latest
+    container_name: pyrocms-db
+    environment:
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - mysql-apoio-data:/var/lib/mysql
+    networks:
+      - apoio
+
+#  nginx: 
+#    image: nginx:alpine 
+#    container_name: pyrocms-nginx 
+#    restart: unless-stopped 
+#    ports: 
+#      - "8000:80" 
+#    volumes: 
+#      - ./:/var/www 
+#      - ./docker-compose/nginx:/etc/nginx/conf.d 
+#    networks: 
+#      - apoio
+
+networks:
+  apoio:
+    driver: bridge
+
+volumes:
+  mysql-apoio-data:
